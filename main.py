@@ -12,9 +12,14 @@ import numpy as np
 # to control the time delay
 import time
 
+
+SCREEN_W, SCREEN_H = 600,600
+
+
+
 # ENV CLASS
 # create a environment 
-class MainEnv(gym,Env):
+class MainEnv(gym.Env):
     # meta data, reference is the source code of gym example
     metadata = {
         'render.modes': ['human', 'rgb_array'],
@@ -48,4 +53,61 @@ class MainEnv(gym,Env):
             done: bool, It indicates whether the movement has been stopped.
         """
 
+        # update reward 
+        reward = 0
+
+        # update done
+        done = False
+
         return self.state ,reward, done
+
+    def reset(self):
+        """ Reset the env after creating the environment
+        Returns:
+            self.state
+        """
+        self.state = (0,0,0)
+        self.steps_beyond_done = None
+        return self.state
+
+    def render(self, mode='human'):
+        """ Display function
+        After updating the variable self.state, 
+        render function will read the latest state value and update the screen.
+        Returns:
+            self.viewer.render(): update function
+        """
+        if self.viewer is None:
+            # draw the elements by rendering module
+            from gym.envs.classic_control import rendering
+            # create a viewer
+            self.viewer = rendering.Viewer(SCREEN_W, SCREEN_H)
+
+        if self.state is None:return None
+        
+        return self.viewer.render(return_rgb_array = mode=='rgb_array')
+    
+    def close(self):
+        """ Close the viewer 
+        """
+        if self.viewer:
+            self.viewer.close()
+            self.viewer = None
+
+
+if __name__ == "__main__":
+    
+    env = MainEnv()
+
+    for _ in range(MAX_EPISODES):
+        state = env.reset()
+        for _ in range(MAX_EP_STEPS):
+            # Refresh env and output image
+            env.render()
+            # robot move 
+            new_state, reward, done = env.step(action)
+            # robot finish
+            if done:
+                input("")
+                env.close()
+                break
