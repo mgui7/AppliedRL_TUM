@@ -15,6 +15,8 @@ import time
 
 SCREEN_W, SCREEN_H = 600,600
 
+MAX_EPISODES = 10
+MAX_EP_STEPS = 200
 
 
 # ENV CLASS
@@ -105,7 +107,7 @@ if __name__ == "__main__":
             # Refresh env and output image
             env.render()
             # robot move 
-            new_state, reward, done = env.step(action)
+            new_state, reward, done = env.step(None)
             # robot finish
             if done:
                 input("")
