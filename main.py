@@ -4,6 +4,10 @@ import gym
 from gym.utils import seeding
 from gym import spaces, logger
 import elements
+import pyglet
+# 
+import time
+
 
 # generate ramdom seed 
 import random
@@ -16,8 +20,17 @@ import time
 # Size of screen
 SCREEN_W, SCREEN_H = 600,600
 
+# Size of Robot
+ROBOT_W = 40.0
+ROBOT_H = 40.0
+
+# The episodes to control the main function
 MAX_EPISODES = 10
 MAX_EP_STEPS = 200
+
+# The start / end position of robot
+ROBOT_START_POSITION = (SCREEN_W / 2, ROBOT_H / 2)
+ROBOT_END_POSITION = (SCREEN_W / 2, SCREEN_H - ROBOT_H)
 
 # Size of Arm 
 ARM_W = 10.0
@@ -26,6 +39,9 @@ ARM_LEN = 150
 # Size of robot
 ROBOT_W = 40.0
 ROBOT_H = 40.0
+
+# Path of robot
+PATH = np.load('maps/long_map_300_sin.npy',encoding = "latin1")[20:]
 
 
 # ENV CLASS
@@ -52,7 +68,7 @@ class MainEnv(gym.Env):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-    def step(self, actions):
+    def step(self, actions=(1,1,1)):
         """ Control the robot
         This function reads the action which is provided by RL Alg and update the states of robot and robot's arm.
         The reward is also calculated at same time.
@@ -63,12 +79,41 @@ class MainEnv(gym.Env):
             reward: double/int (should be discussed)
             done: bool, It indicates whether the movement has been stopped.
         """
+        # Unpack the states
+        x, y, angle_arm1, angle_arm2 = self.state
 
-        # update reward 
+        # Update angles
+        i, j, k       = actions
+        delta_angular =  2 * math.pi / 360
+        if j == 1 & k == 1:
+            y          = y + 1
+            angle_arm1 = angle_arm1 + delta_angular
+            angle_arm2 = angle_arm2 + delta_angular
+        elif j == 1 & k == -1:
+            y          = y + 1
+            angle_arm1 = angle_arm1 + delta_angular
+            angle_arm2 = angle_arm2 - delta_angular
+        elif j == -1 & k == 1:
+            y          = y + 1
+            angle_arm1 = angle_arm1 - delta_angular
+            angle_arm2 = angle_arm2 + delta_angular
+        elif j == -1 & k == -1:
+            y          = y + 1
+            angle_arm1 = angle_arm1 - delta_angular
+            angle_arm2 = angle_arm2 - delta_angular
+
+        # Update location of the robot
+        x = PATH[round(y)][0] # Currently we use the predefined path-map
+
+        # Pack the state
+        self.state = (x, y, angle_arm1, angle_arm2)
+
+        # Update reward 
         reward = 0
-
-        # update done
-        done = False
+        print(x,y)
+        # Update done
+        done =  int(y) == 560
+        done = bool(done)
 
         return self.state ,reward, done
 
@@ -77,7 +122,7 @@ class MainEnv(gym.Env):
         Returns:
             self.state
         """
-        self.state = (0,0,0)
+        self.state = (0,0,0,0)
         self.steps_beyond_done = None
         return self.state
 
@@ -162,23 +207,40 @@ class MainEnv(gym.Env):
             self.viewer.add_geom(self.joint1)
 
             # add the joint2 
-            # self.joint2 = rendering.make_circle(ARM_W / 2)
-            # self.joint2.add_attr(self.arm1_trans)
-            # self.joint2.add_attr(self.arm2_trans)
-            # self.joint2.set_color(.5, .5, .8)
-            # self.viewer.add_geom(self.joint2)
+            self.joint2 = rendering.make_circle(ARM_W / 2)
+            self.joint2.set_color(.5, .5, .8)
+            self.joint2_trans = rendering.Transform(translation=(0, ARM_LEN-(ARM_W / 2)))
+            self.joint2.add_attr(self.joint2_trans)
+            self.joint2.add_attr(self.arm1_trans)
+            self.joint2.add_attr(self.robot_trans)
+            self.viewer.add_geom(self.joint2)
 
             # add the joint3 
-            self.joint3 = rendering.make_circle(ARM_W / 2)
-            self.joint3_trans = rendering.Transform(translation=(0, ARM_LEN - ARM_W))
-            self.joint3.add_attr(self.arm2_trans)
-            self.joint3.add_attr(self.joint3_trans)
-            self.joint3.set_color(.5, .5, .8)
-            self.viewer.add_geom(self.joint3)
+            # self.joint3 = rendering.make_circle(ARM_W / 2)
+            # self.joint3_trans = rendering.Transform(translation=(0, ARM_LEN - ARM_W))
+            # self.joint3.add_attr(self.arm2_trans)
+            # self.joint3.add_attr(self.joint3_trans)
+            # self.joint3.set_color(.5, .5, .8)
+            # self.viewer.add_geom(self.joint3)
 
         if self.state is None:return None
+
+
+
+        # Unpack the states from self.state
+        x      = self.state[0]
+        y      = self.state[1]
+        angle1 = self.state[2]
+        angle2 = self.state[3]
+
+        # Refresh the screen
+        self.robot_trans.set_translation(x, y)
+        self.arm1_trans.set_rotation(angle1)
+        self.arm2_trans.set_rotation(angle2)
         
         return self.viewer.render(return_rgb_array = mode=='rgb_array')
+
+
     
     def close(self):
         """ Close the viewer 
@@ -193,12 +255,18 @@ if __name__ == "__main__":
     env = MainEnv()
 
     for _ in range(MAX_EPISODES):
+
+        # Reset the state
         state = env.reset()
-        for _ in range(MAX_EP_STEPS):
+
+        while True:
+
             # Refresh env and output image
             env.render()
+
             # robot move 
-            new_state, reward, done = env.step(None)
+            new_state, reward, done = env.step()
+
             # robot finish
             if done:
                 input("")

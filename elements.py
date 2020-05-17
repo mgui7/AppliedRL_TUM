@@ -48,7 +48,7 @@ class StartEndPoint():
         self.viewer.add_geom(start)
 
         end = rendering.make_circle(10,10)
-        end_transform = rendering.Transform(translation=(300,580))
+        end_transform = rendering.Transform(translation=(300,560))
         end.add_attr(end_transform)
         end.set_color(END_POINT_COLOR[0],END_POINT_COLOR[1],END_POINT_COLOR[2])
         self.viewer.add_geom(end)
