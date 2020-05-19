@@ -5,8 +5,8 @@ from gym.utils import seeding
 from gym import spaces, logger
 import elements
 import pyglet
-# 
 import time
+from rl import Q_LEARNING
 
 
 # generate ramdom seed 
@@ -250,24 +250,30 @@ class MainEnv(gym.Env):
             self.viewer = None
 
 
+rl = Q_LEARNING()
+
 if __name__ == "__main__":
-    
     env = MainEnv()
-
     for _ in range(MAX_EPISODES):
-
-        # Reset the state
         state = env.reset()
-
-        while True:
+        for _ in range(MAX_EP_STEPS):
 
             # Refresh env and output image
             env.render()
 
-            # robot move 
-            new_state, reward, done = env.step()
+            # Choosing the action based on Q_learning
+            action = rl.choose_action(state)
 
-            # robot finish
+            # rl takes action and acquire the next state and the corresponding reward
+            new_state, reward, done = env.step(action)
+
+            # rl learns from this state transition
+            rl.learn(state, action, reward, new_state)
+
+            # begin from new state
+            state = new_state
+
+
             if done:
                 input("")
                 env.close()
