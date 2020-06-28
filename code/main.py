@@ -14,10 +14,10 @@ rl = Q_LEARNING()
 PATH = np.load('code/maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
 
 SAM_STEP = 45
-MAX_EPISODES = 10000
-MAX_BATCH = 1
+MAX_EPISODES = 500
+MAX_BATCH = 2
 
-DO_PLOT = True
+DO_PLOT = False
 DO_RECORD = True
 
 DELTA_ANGLE = 1
@@ -296,8 +296,8 @@ def record(pd_frame,batch,episode,s):
     return pd_frame
 
 if __name__ == '__main__':
-    file_name = 'misc/' + time.strftime("%m%d%H%M", time.localtime()) + '_' + str(MAX_EPISODES*MAX_BATCH) + '.csv'
-    file_name = 'misc/06271618_10000.csv'
+    file_name = 'code/misc/' + time.strftime("%m%d%H%M", time.localtime()) + '_' + str(MAX_EPISODES*MAX_BATCH) + '.csv'
+    # file_name = 'misc/06271618_10000.csv'
     rl.load_csv(file_name)
 
     # Initial record table 
@@ -337,8 +337,7 @@ if __name__ == '__main__':
                 rl.learn(discrete(s), action, max(reward,max_reward), discrete(s_prime))
                 # print("s_prime: ", discrete(s_prime),"|s: ",discrete(s),"|R: ",reward,"|Action: ",action)
 
-                # Record states, action and reward
-                if DO_RECORD: record_table = record(record_table,k,str(i),s)
+
                 # Update states
                 s = discrete(s_prime)
                 
@@ -349,7 +348,9 @@ if __name__ == '__main__':
                    
                     env.close()
                     break
-
+            
+            # Record states, action and reward
+            if DO_RECORD: record_table = record(record_table,k,str(i),s)
     rl.save_csv(file_name)
-    if DO_RECORD: record_table.to_csv( "misc/"+data_name+ ".csv",mode="a",index=False,sep=',')
+    if DO_RECORD: record_table.to_csv( "code/misc/"+data_name+ ".csv",mode="a",index=False,sep=',')
 

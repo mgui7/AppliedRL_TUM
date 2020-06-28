@@ -72,7 +72,7 @@ class Q_LEARNING(object):
             print('Error occured while loading NP array')
             return False
 
-    def save_csv(self,name = 'misc/q_table.csv'):
+    def save_csv(self,name = 'code/misc/q_table.csv'):
         if not os.path.isfile(name):
             print('ML Process successfully saved into ' + name)
             self.q_table.to_csv(name)
@@ -86,7 +86,7 @@ class Q_LEARNING(object):
                 print('ML Process successfully overwritten into ' + name)
                 self.q_table.to_csv(name)
 
-    def load_csv(self, name = 'misc/q_table.csv'):
+    def load_csv(self, name = 'code/misc/q_table.csv'):
         if os.path.isfile(name):
             self.q_table = pd.read_csv(name , index_col=[0])
             print('ML Process successfully loaded from ' + name)
