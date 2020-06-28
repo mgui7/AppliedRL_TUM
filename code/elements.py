@@ -1,31 +1,37 @@
+"""
+这个module存储着固定的，不会变化的背景图案，例如起点和终点。
+"""
+
+
 import pyglet
 from gym.envs.classic_control import rendering
 
-"""
-Introduction of this modules
-
-This module draws some static elements, start point and target, or each trajectory on the map. 
-Attention, the score points are not attracted by this module because they will disappear after 
-the end of arm2 reach the score point. 
-
-"""
-
-# Size of screen
 SCREEN_W = 600
 SCREEN_H = 600
 
-# The color of start and end point
+START_POINT_POSITION = (20,20)
 START_POINT_COLOR = (255/255,0,0)
+
+END_POINT_POSITION = (90,90)
 END_POINT_COLOR  = (0,255/255,0)
 
+SCORE1_POINT_POSITION = (1,2)
+SCORE2_POINT_POSITION = (1,2)
+SCORE3_POINT_POSITION = (1,2)
+SCORE4_POINT_POSITION = (1,2)
+
+SCORE_POINT_COLOR = (255/255,192/255,0)
+
+p1 = (150,150)
+p2 = (450,450)
+p3 = (150,450)
+p4 = (450,150)
+
+RENDER_PERIOD = 5
+ANGLE_STEPS = 8
+
 class TrackLine():
-    """ The trajectory of movement of robot.
-    """
     def __init__(self,viewer):
-        """
-        Args:
-            viewer: the current viewer of the program. A element should be attached on this viewer.
-        """
         self.viewer = viewer
 
     def draw_line_track(self):
@@ -35,9 +41,9 @@ class TrackLine():
 
     
 class StartEndPoint():
-    """ The start and end point on the map
-    """
     def __init__(self,viewer):
+        self.start_position = START_POINT_POSITION
+        self.end_position = END_POINT_POSITION
         self.viewer = viewer
 
     def draw_points(self):
@@ -48,7 +54,10 @@ class StartEndPoint():
         self.viewer.add_geom(start)
 
         end = rendering.make_circle(10,10)
-        end_transform = rendering.Transform(translation=(300,560))
+        end_transform = rendering.Transform(translation=(300,580))
         end.add_attr(end_transform)
         end.set_color(END_POINT_COLOR[0],END_POINT_COLOR[1],END_POINT_COLOR[2])
         self.viewer.add_geom(end)
+
+
+
