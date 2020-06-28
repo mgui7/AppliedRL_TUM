@@ -11,13 +11,13 @@ from rl import Q_LEARNING
 rl = Q_LEARNING()
 
 
-PATH = np.load('maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
+PATH = np.load('code/maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
 
 SAM_STEP = 45
-MAX_EPISODES = 1000
-MAX_BATCH = 10
+MAX_EPISODES = 10000
+MAX_BATCH = 1
 
-DO_PLOT = False
+DO_PLOT = True
 DO_RECORD = True
 
 DELTA_ANGLE = 1
@@ -195,13 +195,13 @@ class MeinEnv(object):
                         joint_position[1] + ARM_LEN * np.cos(math.pi*ang2/180))
 
         # Update reward
-        reward, self.state[4] = R.reward3(finger_position,self.state[4])
+        self.reward, self.state[4] = R.reward2(finger_position,self.state[4])
         # reward, self.state[4] = R.reward_test(finger_position,self.state[4])
 
         # Update done
         done = bool(self.state[1] >= 580)
 
-        return self.state, reward, done
+        return self.state, self.reward, done
 
     def _reset_degree(self,degree):
         """ Degree is in 0 ~ 360
@@ -256,7 +256,7 @@ def discrete(s):
     x,y,angle_arm1,angle_arm2,weight_set = s
     x_r  = int(x)
     y_r  = int(round(y))
-
+    
     # if angle_arm1 == 360: angle_arm1 = 0 
     # else: angle_arm1 = round(angle_arm1/45)
     # if angle_arm2 == 360: angle_arm2 = 0 
@@ -314,18 +314,21 @@ if __name__ == '__main__':
 
             # reset all state 
             s = env.reset()
-            print("---------- "+str(i)+" term initial state : ", s, "---------")
+            print("---------- "+str(i)+" term "+"----------")
 
             for cycle in range(200):
 
                 # choose an action from Q-table
                 action = rl.choose_action(discrete(s))
+
+                # if plot window
                 if DO_PLOT: env.render()
                 
                 # Jump into sample period
                 max_reward = -1000
                 for _ in range(SAM_STEP):
                     s_prime, reward, done = env.step(action)
+                    # record maximum reward
                     if reward > 5000: max_reward = reward
                     if DO_PLOT: env.render()
                     if done:break
@@ -340,13 +343,13 @@ if __name__ == '__main__':
                 s = discrete(s_prime)
                 
                 if done:
-                    print("s_prime: ", discrete(s_prime),"|s: ",discrete(s),"|R: ",reward)
+                    print("s_prime: ", discrete(s_prime),"|s: ",discrete(s),"|R: ",reward,"\n")
                     # print("Done in",cycle,'Iterations')
                     # pd_frame is exported as file if done is true.
                    
                     env.close()
                     break
 
-        rl.save_csv(file_name)
+    rl.save_csv(file_name)
     if DO_RECORD: record_table.to_csv( "misc/"+data_name+ ".csv",mode="a",index=False,sep=',')
 
