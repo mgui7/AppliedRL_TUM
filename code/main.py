@@ -15,7 +15,7 @@ PATH = np.load('maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
 
 SAM_STEP = 45
 MAX_EPISODES = 1000
-MAX_BATCH = 100
+MAX_BATCH = 10
 
 DO_PLOT = False
 DO_RECORD = True
@@ -50,7 +50,7 @@ class Viewer(pyglet.window.Window):
         self.center_image(bg)
         self.bg = pyglet.sprite.Sprite(img=bg, x=bg.width/2, y=bg.height/2, batch=self.batch)
 
-        # 根据铆钉点，从外部的reset函数位置，获得state，并初始化x和y
+        # Based on Anchor，read initial states
         self.center_image(robot)
         self.robot = pyglet.sprite.Sprite(img=robot, x=self.state[0], y=self.state[1], batch=self.batch)
 
@@ -110,9 +110,9 @@ class Viewer(pyglet.window.Window):
         s1,s2,s3 = state[4]
         if not s1:
             self.score1.visible = False
-        elif not s2:
+        if not s2:
             self.score2.visible = False
-        elif not s3:
+        if not s3:
             self.score3.visible = False
 
 
@@ -123,7 +123,7 @@ class Viewer(pyglet.window.Window):
         
 
     def render(self,state,reward):
-        self._update_robot(state)  # 根据外界状态，刷新element的情况
+        self._update_robot(state)  
         self._scores_detection(state)
         self._update_label(reward)
         self.switch_to()
@@ -297,7 +297,7 @@ def record(pd_frame,batch,episode,s):
 
 if __name__ == '__main__':
     file_name = 'misc/' + time.strftime("%m%d%H%M", time.localtime()) + '_' + str(MAX_EPISODES*MAX_BATCH) + '.csv'
-    file_name = 'misc/06271618_10000_kang.csv'
+    file_name = 'misc/06271618_10000.csv'
     rl.load_csv(file_name)
 
     # Initial record table 
@@ -347,6 +347,6 @@ if __name__ == '__main__':
                     env.close()
                     break
 
-    rl.save_csv(file_name)
+        rl.save_csv(file_name)
     if DO_RECORD: record_table.to_csv( "misc/"+data_name+ ".csv",mode="a",index=False,sep=',')
 
