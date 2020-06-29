@@ -30,26 +30,26 @@ def reward2(finger_pos,state):
     x, y = finger_pos
     state = list(state)
     if state == [1,1,1]:
-        x_score, y_score = target_points[0]
-        if not isClose(x,y,x_score,y_score):
-            res += math.exp(-(math.sqrt(math.pow((x - x_score), 2) + math.pow((y - y_score), 2)))*0.0001) - 1.5
-        else:
-            res += 10000
-            state[0] = 0
-    elif state == [0,1,1]:
-        x_score, y_score = target_points[1]
-        if not isClose(x,y,x_score,y_score):
-            res += math.exp(-(math.sqrt(math.pow((x - x_score), 2) + math.pow((y - y_score), 2)))*0.0001) - 1.5
-        else:
-            res += 10000
-            state[1] = 0
-    elif state == [0,0,1]:
         x_score, y_score = target_points[2]
         if not isClose(x,y,x_score,y_score):
             res += math.exp(-(math.sqrt(math.pow((x - x_score), 2) + math.pow((y - y_score), 2)))*0.0001) - 1.5
         else:
             res += 10000
             state[2] = 0
+    elif state == [1,1,0]:
+        x_score, y_score = target_points[1]
+        if not isClose(x,y,x_score,y_score):
+            res += math.exp(-(math.sqrt(math.pow((x - x_score), 2) + math.pow((y - y_score), 2)))*0.0001) - 1.5
+        else:
+            res += 10000
+            state[1] = 0
+    elif state == [1,0,0]:
+        x_score, y_score = target_points[0]
+        if not isClose(x,y,x_score,y_score):
+            res += math.exp(-(math.sqrt(math.pow((x - x_score), 2) + math.pow((y - y_score), 2)))*0.0001) - 1.5
+        else:
+            res += 10000
+            state[0] = 0
     elif state == [0,0,0]:
         x_score, y_score = end_point
         if not isClose(x,y,x_score,y_score):

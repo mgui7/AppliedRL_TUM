@@ -11,13 +11,13 @@ from rl import Q_LEARNING
 rl = Q_LEARNING()
 
 
-PATH = np.load('code/maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
+PATH = np.load('maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
 
 SAM_STEP = 45
 MAX_EPISODES = 500
 MAX_BATCH = 2
 
-DO_PLOT = False
+DO_PLOT = 1
 DO_RECORD = True
 
 DELTA_ANGLE = 1
@@ -196,7 +196,8 @@ class MeinEnv(object):
 
         # Update reward
         self.reward, self.state[4] = R.reward2(finger_position,self.state[4])
-        # reward, self.state[4] = R.reward_test(finger_position,self.state[4])
+        # reward, self.state[4] = R.reward3(finger_position,self.state[4])
+        # reward, self.state[4] = R.reward_sparse(finger_position,self.state[4])
 
         # Update done
         done = bool(self.state[1] >= 580)

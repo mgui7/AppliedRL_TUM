@@ -10,9 +10,9 @@ ANGLE_STEPS   = elements.ANGLE_STEPS
 class Q_LEARNING(object):
 
     def __init__(self, learning_rate = 0.1, reward_decay = 0.9, e_greedy = 0.9):
-        # self.actions = [(i,j,k) for i in [-1,0,1] for j in [-1,0,1] for k in [-1,0,1]]
+        self.actions = [(i,j,k) for i in [-1,0,1] for j in [-1,0,1] for k in [-1,0,1]]
         # self.actions = [(i,j,k) for i in [-1,0,1] for j in [0] for k in [0]]
-        self.actions = [(i,j,k) for i in [1] for j in [-1,0,1] for k in [-1,0,1]]
+        # self.actions = [(i,j,k) for i in [1] for j in [-1,0,1] for k in [-1,0,1]]
         self.lr      = learning_rate
         self.gamma   = reward_decay
         self.epsilon = e_greedy
