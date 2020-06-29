@@ -17,7 +17,7 @@ SAM_STEP = 45
 MAX_EPISODES = 500
 MAX_BATCH = 2
 
-DO_PLOT = 1
+DO_PLOT = 0
 DO_RECORD = True
 
 DELTA_ANGLE = 1
@@ -200,7 +200,8 @@ class MeinEnv(object):
         # reward, self.state[4] = R.reward_sparse(finger_position,self.state[4])
 
         # Update done
-        done = bool(self.state[1] >= 580)
+        # done = bool(self.state[1] >= 580)
+        done = bool(self.state[1] >= 580) and sum(self.state[4]) == 0
 
         return self.state, self.reward, done
 
@@ -351,6 +352,7 @@ if __name__ == '__main__':
                     break
             
             # Record states, action and reward
+            else: print('Episode unfinished. Current state progress:',s)
             if DO_RECORD: record_table = record(record_table,k,str(i),s)
     rl.save_csv(file_name)
     if DO_RECORD: record_table.to_csv( "code/misc/"+data_name+ ".csv",mode="a",index=False,sep=',')
