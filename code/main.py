@@ -11,7 +11,7 @@ from rl import Q_LEARNING
 rl = Q_LEARNING()
 
 
-PATH = np.load('maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
+PATH = np.load('code/maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
 
 SAM_STEP = 45
 MAX_EPISODES = 500
@@ -195,13 +195,13 @@ class MeinEnv(object):
                         joint_position[1] + ARM_LEN * np.cos(math.pi*ang2/180))
 
         # Update reward
-        self.reward, self.state[4] = R.reward2(finger_position,self.state[4])
-        # reward, self.state[4] = R.reward3(finger_position,self.state[4])
-        # reward, self.state[4] = R.reward_sparse(finger_position,self.state[4])
+        # self.reward, self.state[4] = R.reward2(finger_position,self.state[4])
+        # self.reward, self.state[4] = R.reward3(finger_position,self.state[4])
+        self.reward, self.state[4] = R.reward_sparse(finger_position,self.state[4])
 
         # Update done
-        # done = bool(self.state[1] >= 580)
-        done = bool(self.state[1] >= 580) and sum(self.state[4]) == 0
+        done = bool(self.state[1] >= 580)
+        # done = bool(self.state[1] >= 580) and sum(self.state[4]) == 0
 
         return self.state, self.reward, done
 
@@ -329,7 +329,7 @@ if __name__ == '__main__':
                 # Jump into sample period
                 max_reward = -1000
                 for _ in range(SAM_STEP):
-                    s_prime, reward, done = env.step(action)
+                    s_prime, reward, done = env.step([1,action[1],action[2]])
                     # record maximum reward
                     if reward > 5000: max_reward = reward
                     if DO_PLOT: env.render()
