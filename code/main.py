@@ -201,7 +201,8 @@ class MeinEnv(object):
 
         # Update done
         # done = bool(self.state[1] >= 580)
-        done = bool(self.state[1] >= 580) and sum(self.state[4]) == 0
+        # done = bool(self.state[1] >= 580) and sum(self.state[4]) == 0
+        done = sum(self.state[4]) == 0 and R.isClose(finger_position[0],finger_position[1],300,580)
 
         return self.state, self.reward, done
 
