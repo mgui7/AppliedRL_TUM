@@ -295,6 +295,7 @@ def record(pd_frame,batch,episode,s,done,mean_reward):
                         's1':s[4][0], 
                         's2':s[4][1],
                         's3':s[4][2],
+                        'end_state':s,
                         'done':str(done),
                         'mean_reward':mean_reward}], ignore_index=True)
 
@@ -302,11 +303,11 @@ def record(pd_frame,batch,episode,s,done,mean_reward):
 
 if __name__ == '__main__':
     file_name = 'code/misc/' + time.strftime("%m%d%H%M", time.localtime()) + '_' + str(MAX_EPISODES*MAX_BATCH) + '.csv'
-    #file_name = 'misc/06291314_1000.csv'
+    file_name = 'code/misc/07021144_2000.csv'
     rl.load_csv(file_name)
 
     # Initial record table 
-    record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3','done','mean_reward'))
+    record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward'))
     data_name = str(time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime()))
 
     for k in range(MAX_BATCH):
