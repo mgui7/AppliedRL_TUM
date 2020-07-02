@@ -14,8 +14,8 @@ rl = Q_LEARNING()
 PATH = np.load('code/maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
 
 SAM_STEP = 45
-MAX_EPISODES = 500
-MAX_BATCH = 2
+MAX_EPISODES = 2500
+MAX_BATCH = 4
 
 DO_PLOT = 0
 DO_RECORD = True
@@ -200,8 +200,8 @@ class MeinEnv(object):
         self.reward, self.state[4] = R.reward_sparse(finger_position,self.state[4])
 
         # Update done
-        done = bool(self.state[1] >= 580)
-        # done = bool(self.state[1] >= 580) and sum(self.state[4]) == 0
+        # done = bool(self.state[1] >= 580)
+        done = bool(self.state[1] >= 580) and sum(self.state[4]) == 0
 
         return self.state, self.reward, done
 
@@ -272,7 +272,7 @@ def discrete(s):
     return [x_r,y_r,int(angle_arm1),int(angle_arm2),tuple(weight_set)]
 
 
-def record(pd_frame,batch,episode,s):
+def record(pd_frame,batch,episode,s,done,mean_reward):
     """ By Record function,  all states will be saved in pd_frame.
     And pd_frame is waiting for exporting.
     Note: pd_frame = pd_frame.append is important. Otherwise pd_frame would be None.
@@ -293,17 +293,19 @@ def record(pd_frame,batch,episode,s):
                         'term':episode,
                         's1':s[4][0], 
                         's2':s[4][1],
-                        's3':s[4][2]}], ignore_index=True)
+                        's3':s[4][2],
+                        'done':str(done),
+                        'mean_reward':mean_reward}], ignore_index=True)
 
     return pd_frame
 
 if __name__ == '__main__':
     file_name = 'code/misc/' + time.strftime("%m%d%H%M", time.localtime()) + '_' + str(MAX_EPISODES*MAX_BATCH) + '.csv'
-    # file_name = 'misc/06271618_10000.csv'
+    #file_name = 'misc/06291314_1000.csv'
     rl.load_csv(file_name)
 
     # Initial record table 
-    record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3'))
+    record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3','done'))
     data_name = str(time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime()))
 
     for k in range(MAX_BATCH):
@@ -317,19 +319,18 @@ if __name__ == '__main__':
             # reset all state 
             s = env.reset()
             print("---------- "+str(i)+" term "+"----------")
-
+            total_reward = []
             for cycle in range(200):
 
                 # choose an action from Q-table
                 action = rl.choose_action(discrete(s))
-
                 # if plot window
                 if DO_PLOT: env.render()
                 
                 # Jump into sample period
                 max_reward = -1000
                 for _ in range(SAM_STEP):
-                    s_prime, reward, done = env.step([1,action[1],action[2]])
+                    s_prime, reward, done = env.step(action)
                     # record maximum reward
                     if reward > 5000: max_reward = reward
                     if DO_PLOT: env.render()
@@ -338,7 +339,7 @@ if __name__ == '__main__':
                 # Learning and update table
                 rl.learn(discrete(s), action, max(reward,max_reward), discrete(s_prime))
                 # print("s_prime: ", discrete(s_prime),"|s: ",discrete(s),"|R: ",reward,"|Action: ",action)
-
+                total_reward.append(max(reward,max_reward))
 
                 # Update states
                 s = discrete(s_prime)
@@ -353,7 +354,7 @@ if __name__ == '__main__':
             
             # Record states, action and reward
             else: print('Episode unfinished. Current state progress:',s)
-            if DO_RECORD: record_table = record(record_table,k,str(i),s)
+            if DO_RECORD: record_table = record(record_table,k,str(i),s,done,np.mean(total_reward))
     rl.save_csv(file_name)
     if DO_RECORD: record_table.to_csv( "code/misc/"+data_name+ ".csv",mode="a",index=False,sep=',')
 
