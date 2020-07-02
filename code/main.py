@@ -14,8 +14,8 @@ rl = Q_LEARNING()
 PATH = np.load('code/maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
 
 SAM_STEP = 45
-MAX_EPISODES = 2500
-MAX_BATCH = 4
+MAX_EPISODES = 5
+MAX_BATCH = 1
 
 DO_PLOT = 0
 DO_RECORD = True
@@ -305,7 +305,7 @@ if __name__ == '__main__':
     rl.load_csv(file_name)
 
     # Initial record table 
-    record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3','done'))
+    record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3','done','mean_reward'))
     data_name = str(time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime()))
 
     for k in range(MAX_BATCH):
