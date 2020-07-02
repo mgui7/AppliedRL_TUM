@@ -90,6 +90,9 @@ def reward_sparse(finger_pos, state):
                 state[i] = 0
                 res += 10000
                 break
+    if sum(state) == 0:
+        x_score, y_score = end_point
+        if isClose(x,y,x_score,y_score): res += 10000
 
     return res, tuple(state)
 
