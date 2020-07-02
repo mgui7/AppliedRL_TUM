@@ -5,24 +5,28 @@ import pandas as pd
 import random
 import math
 import time
+
+# Load different Rewards
 import reward_calculate as R
 
+# Load RL Algorithm
 from rl import Q_LEARNING
 rl = Q_LEARNING()
 
-
+# Load path of robot
 PATH = np.load('code/maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
 
-SAM_STEP = 45
-MAX_EPISODES = 5
-MAX_BATCH = 1
+# Global variables
+SAM_STEP = 45    # sample steps
+MAX_EPISODES = 4 # Number of episodes
+MAX_BATCH = 5    # Number of Batch
 
-DO_PLOT = 0
-DO_RECORD = True
+DO_PLOT = 1    # Display or not
+DO_RECORD = 0  # Record or not
 
-DELTA_ANGLE = 1
-ARM_LEN = 150
-V = 20
+DELTA_ANGLE = 1 # Angular velocity
+V = 20          # Velocity of Robot Base
+ARM_LEN = 150   # Length of robotic Arm
 
 class Viewer(pyglet.window.Window):
     """ Viewer Class to display movement of robot.
@@ -201,8 +205,7 @@ class MeinEnv(object):
 
         # Update done
         # done = bool(self.state[1] >= 580)
-        # done = bool(self.state[1] >= 580) and sum(self.state[4]) == 0
-        done = sum(self.state[4]) == 0 and R.isClose(finger_position[0],finger_position[1],300,580)
+        done = bool(self.state[1] >= 580) and sum(self.state[4]) == 0
 
         return self.state, self.reward, done
 
@@ -303,16 +306,19 @@ def record(pd_frame,batch,episode,s,done,mean_reward):
 
 if __name__ == '__main__':
     file_name = 'code/misc/' + time.strftime("%m%d%H%M", time.localtime()) + '_' + str(MAX_EPISODES*MAX_BATCH) + '.csv'
-    file_name = 'code/misc/07021144_2000.csv'
+#    file_name = 'code/misc/07021144_2000.csv'
+
+    # Read new Q-Table or Create new Q-Table 
     rl.load_csv(file_name)
 
-    # Initial record table 
+    # Initial record table and fileName 
     record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward'))
     data_name = str(time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime()))
-
+    
+    # Start Batch
     for k in range(MAX_BATCH):
 
-        # Initial env
+        # Initial Env
         env = MeinEnv()
 
         for i in range(MAX_EPISODES):
@@ -321,7 +327,10 @@ if __name__ == '__main__':
             # reset all state 
             s = env.reset()
             print("---------- "+str(i)+" term "+"----------")
+            # Record total Reward
             total_reward = []
+            
+            # 
             for cycle in range(200):
 
                 # choose an action from Q-table
@@ -357,6 +366,8 @@ if __name__ == '__main__':
             # Record states, action and reward
             else: print('Episode unfinished. Current state progress:',s)
             if DO_RECORD: record_table = record(record_table,k,str(i),s,done,np.mean(total_reward))
-    rl.save_csv(file_name)
-    if DO_RECORD: record_table.to_csv( "code/misc/"+data_name+ ".csv",mode="a",index=False,sep=',')
+        rl.save_csv(file_name)
+        if DO_RECORD: 
+            record_table.to_csv( "code/misc/"+data_name+ ".csv",mode="a",index=False,sep=',')
+            record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward'))
 
