@@ -2,7 +2,7 @@ import math
 import numpy as np
 
 target_points = [[150,450],[100,150],[450,200]]
-end_point = [20,580]
+end_point = [300,580]
 threshold = 500
 
 def reward1(finger_pos,state):
@@ -83,16 +83,17 @@ def reward_sparse(finger_pos, state):
     state = list(state)
     x,y = finger_pos
     res = 0
-    for i in range(3):
-        if state[i] == 1:
-            x_score, y_score = target_points[i]
-            if isClose(x,y,x_score,y_score):
-                state[i] = 0
-                res += 10000
-                break
     if sum(state) == 0:
         x_score, y_score = end_point
         if isClose(x,y,x_score,y_score): res += 10000
+    else:
+        for i in range(3):
+            if state[i] == 1:
+                x_score, y_score = target_points[i]
+                if isClose(x,y,x_score,y_score):
+                    state[i] = 0
+                    res += 10000
+                    break
 
     return res, tuple(state)
 
