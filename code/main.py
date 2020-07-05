@@ -29,10 +29,18 @@ V = 20          # Velocity of Robot Base
 ARM_LEN = 150   # Length of robotic Arm
 
 class Viewer(pyglet.window.Window):
-    """ Viewer Class to display movement of robot.
+    """Viewer Class which can display the movement of robot base and robotic arm by GUI.
+
+    Args:
+        pyglet (import from pyglet.window libs): None
     """
 
     def __init__(self,state):
+        """ init function will initiate the state which comes from MeinEnv
+
+        Args:
+            state (list): contains all states. About states, You can find more information in README.md
+        """
         self.state = state
         # Create a window and size of window is predefined.
         super(Viewer, self).__init__(width=600, height=600, resizable=False, caption='Arm', vsync=False)
@@ -50,7 +58,8 @@ class Viewer(pyglet.window.Window):
         arm = pyglet.resource.image("arm.png")
         score = pyglet.resource.image("score.png")
         bg = pyglet.resource.image("light_map.png")
-
+        
+        # Set Background
         self.center_image(bg)
         self.bg = pyglet.sprite.Sprite(img=bg, x=bg.width/2, y=bg.height/2, batch=self.batch)
 
@@ -95,6 +104,11 @@ class Viewer(pyglet.window.Window):
 
 
     def _update_robot(self,state):
+        """Update state of robot in order to refresh the screen.
+
+        Args:
+            state (list): Ignore.
+        """
         # Update location of robot
         self.robot.x = max(state[0],0)
         self.robot.y = max(state[1],0)
@@ -111,6 +125,13 @@ class Viewer(pyglet.window.Window):
         self.arm2.rotation = state[3] 
 
     def _scores_detection(self,state):
+        """ This function will control the visibility of scores.
+        If ths if condition have detected that states of scores is changed from 1 to 0.
+        The scores in screen will dispear. 
+
+        Args:
+            state (list): Ignore.
+        """
         s1,s2,s3 = state[4]
         if not s1:
             self.score1.visible = False
@@ -121,12 +142,23 @@ class Viewer(pyglet.window.Window):
 
 
     def _update_label(self,reward):
+        """ Update label and refresh screen
+
+        Args:
+            reward (double): the reward which the robot gets.
+        """
         self.reward_label.text= "Reward: " + '%f'%(reward)
         self.position_label.text = "Position: " + '({},{})'.format(round(int(self.robot.x)),round(self.robot.y)) 
         self.angle_label.text = "Angles: " + "({},{})".format(round(self.arm1.rotation,2),round(self.arm2.rotation,2))
         
 
     def render(self,state,reward):
+        """ Render function to implement all function.
+
+        Args:
+            state (list): States of robot.
+            reward (double): The reward value.
+        """
         self._update_robot(state)  
         self._scores_detection(state)
         self._update_label(reward)
@@ -136,6 +168,8 @@ class Viewer(pyglet.window.Window):
         self.flip()
 
     def on_draw(self):
+        """Official function from pyglet. 
+        """
         self.clear()       
         self.batch.draw()
         self.robot.draw()
@@ -150,6 +184,11 @@ class Viewer(pyglet.window.Window):
         self.angle_label.draw()
         
     def center_image(self,image):
+        """Change the anchor of imported image.
+
+        Args:
+            image (pyglet.resource.image()): Note, it is not read by imread().
+        """
         image.anchor_x = image.width/2
         image.anchor_y = image.height/2
     
@@ -257,7 +296,7 @@ def discrete(s):
     Args:
         s: tuple, states
     returns:
-        tuple: converted states
+        list: converted states
     """
     
     x,y,angle_arm1,angle_arm2,weight_set = s
