@@ -28,7 +28,7 @@ In this Project, Reinforcement Learning is implemented to solve the task that ro
 You may see 5 items in state list variable.
 For example, you can see the following numbers: 
 [570.0, 200.00000000000165, 45, 45, (1, 1, 1)]
-1. x postion of robot base
+1. x position of robot base
 2. y position 
 3. Angle of arm1
 4. Angle of arm2
@@ -42,3 +42,4 @@ It looks like:
 2. Arm1 direction: 1 or 0 or -1
 3. Arm2 direction: 1 or 0 or -1
 1 means move(rotate) forwards, 0 means don't move and -1 means move(rotate) backwards.
+

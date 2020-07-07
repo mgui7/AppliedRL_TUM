@@ -6,6 +6,15 @@ end_point = [300,580]
 threshold = 500
 
 def reward1(finger_pos,state):
+    """[summary]
+
+    Args:
+        finger_pos ([type]): [description]
+        state ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     res = 0
     x, y = finger_pos
     state = list(state)
@@ -26,6 +35,15 @@ def reward1(finger_pos,state):
     return res, tuple(state)
 
 def reward2(finger_pos,state):
+    """[summary]
+
+    Args:
+        finger_pos ([type]): [description]
+        state ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     res = 0
     x, y = finger_pos
     state = list(state)
@@ -60,6 +78,15 @@ def reward2(finger_pos,state):
     return res, tuple(state)
 
 def reward3(finger_pos,state):
+    """[summary]
+
+    Args:
+        finger_pos ([type]): [description]
+        state ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     res = 0
     x, y = finger_pos
     state = list(state)
@@ -80,6 +107,15 @@ def reward3(finger_pos,state):
     return res - sum(state), tuple(state)
 
 def reward_sparse(finger_pos, state):
+    """[summary]
+
+    Args:
+        finger_pos ([type]): [description]
+        state ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     state = list(state)
     x,y = finger_pos
     res = 0
@@ -98,8 +134,27 @@ def reward_sparse(finger_pos, state):
     return res, tuple(state)
 
 def reward_test(finger_pos, state):
+    """[summary]
+
+    Args:
+        finger_pos ([type]): [description]
+        state ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     return finger_pos[1] - 1000, tuple(state)
 
 def isClose(x,y,x1,y1):
+    """[summary]
 
+    Args:
+        x ([type]): [description]
+        y ([type]): [description]
+        x1 ([type]): [description]
+        y1 ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
     return 0 if math.pow((x - x1), 2) + math.pow((y - y1), 2) > threshold else 1

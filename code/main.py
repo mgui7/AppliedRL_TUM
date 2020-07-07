@@ -346,10 +346,9 @@ def record(pd_frame,batch,episode,s,done,mean_reward):
 
 if __name__ == '__main__':
     file_name = 'misc/' + time.strftime("%m%d%H%M", time.localtime()) + '_' + str(MAX_EPISODES*MAX_BATCH) + '.csv'
-#    file_name = 'code/misc/07021144_2000.csv'
 
     # Read new Q-Table or Create new Q-Table 
-    rl.load_csv('misc/07051645_250.csv')
+    rl.load_csv(file_name)
 
     # Initial record table and fileName 
     record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward'))
@@ -407,6 +406,7 @@ if __name__ == '__main__':
             else: print('Episode unfinished. Current state progress:',s)
             if DO_RECORD: record_table = record(record_table,k,str(i),s,done,np.mean(total_reward))
         rl.save_csv(file_name)
+        
         if DO_RECORD: 
             record_table.to_csv( "misc/"+data_name+ ".csv",mode="a",index=False,sep=',')
             record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward'))

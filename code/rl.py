@@ -8,8 +8,20 @@ screen_height = elements.SCREEN_H
 ANGLE_STEPS   = elements.ANGLE_STEPS
 
 class Q_LEARNING(object):
+    """[summary]
+
+    Args:
+        object ([type]): [description]
+    """
 
     def __init__(self, learning_rate = 0.1, reward_decay = 0.9, e_greedy = 0.9):
+        """[summary]
+
+        Args:
+            learning_rate (float, optional): [description]. Defaults to 0.1.
+            reward_decay (float, optional): [description]. Defaults to 0.9.
+            e_greedy (float, optional): [description]. Defaults to 0.9.
+        """
         self.actions = [(i,j,k) for i in [-1,0,1] for j in [-1,0,1] for k in [-1,0,1]]
         # self.actions = [(i,j,k) for i in [-1,0,1] for j in [0] for k in [0]]
         # self.actions = [(i,j,k) for i in [1] for j in [-1,0,1] for k in [-1,0,1]]
@@ -19,6 +31,14 @@ class Q_LEARNING(object):
         self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
 
     def  choose_action(self, observation = (0,0,0,0,[0,0,0])):
+        """[summary]
+
+        Args:
+            observation (tuple, optional): [description]. Defaults to (0,0,0,0,[0,0,0]).
+
+        Returns:
+            [type]: [description]
+        """
         # Observation: location, ang1, ang2
         observation[4] = tuple(observation[4])
         observation = tuple(observation)
@@ -38,7 +58,14 @@ class Q_LEARNING(object):
         return action
 
     def learn(self, s, a, r, s_):
+        """[summary]
 
+        Args:
+            s ([type]): [description]
+            a ([type]): [description]
+            r ([type]): [description]
+            s_ ([type]): [description]
+        """
         s, s_ = tuple(s), tuple(s_)
         self.check_state_if_exist(s_)
         q_predict = self.q_table.loc[[s], [a]]
@@ -49,6 +76,11 @@ class Q_LEARNING(object):
         self.q_table.loc[[s], [a]] += self.lr * (q_target[0] - q_predict.iloc[0,0])  # update
 
     def check_state_if_exist(self,state):
+        """[summary]
+
+        Args:
+            state ([type]): [description]
+        """
         if state not in self.q_table.index:
             # append new state to q table
             self.q_table = self.q_table.append(
@@ -60,10 +92,23 @@ class Q_LEARNING(object):
             )
 
     def save_file(self, name = 'q_table.npy'):
+        """[summary]
+
+        Args:
+            name (str, optional): [description]. Defaults to 'q_table.npy'.
+        """
         np.save(name , self.q_table)
         print('ML Process successfully saved into' + name)
 
     def load_file(self, name = 'q_table.npy'):
+        """[summary]
+
+        Args:
+            name (str, optional): [description]. Defaults to 'q_table.npy'.
+
+        Returns:
+            [type]: [description]
+        """
         try:
             self.q_table = np.load(name)
             print('ML Process successfully loaded from' + name)
@@ -73,6 +118,11 @@ class Q_LEARNING(object):
             return False
 
     def save_csv(self,name = 'code/misc/q_table.csv'):
+        """[summary]
+
+        Args:
+            name (str, optional): [description]. Defaults to 'code/misc/q_table.csv'.
+        """
         if not os.path.isfile(name):
             print('ML Process successfully saved into ' + name)
             self.q_table.to_csv(name)
@@ -87,6 +137,14 @@ class Q_LEARNING(object):
                 self.q_table.to_csv(name)
 
     def load_csv(self, name = 'code/misc/q_table.csv'):
+        """[summary]
+
+        Args:
+            name (str, optional): [description]. Defaults to 'code/misc/q_table.csv'.
+
+        Returns:
+            [type]: [description]
+        """
         if os.path.isfile(name):
             self.q_table = pd.read_csv(name , index_col=[0])
             print('ML Process successfully loaded from ' + name)
