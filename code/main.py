@@ -14,12 +14,12 @@ from rl import Q_LEARNING
 rl = Q_LEARNING()
 
 # Load path of robot
-PATH = np.load('maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
+PATH = np.load('code/maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
 
 # Global variables
 SAM_STEP = 45    # sample steps
-MAX_EPISODES = 250 # Number of episodes
-MAX_BATCH = 1    # Number of Batch
+MAX_EPISODES = 5 # Number of episodes
+MAX_BATCH = 2    # Number of Batch
 
 DO_PLOT = 1    # Display or not
 DO_RECORD = 0  # Record or not
@@ -114,14 +114,14 @@ class Viewer(pyglet.window.Window):
         self.robot.y = max(state[1],0)
 
         # Update location of arm1
-        self.arm1.x = self.robot.x
-        self.arm1.y = self.robot.y
+        self.arm1.x        = self.robot.x
+        self.arm1.y        = self.robot.y
         self.arm1.rotation = state[2]
 
         # Update location of arm2
-        self.arm2.x = self.arm1.x + (self.arm1.height-self.arm1.width) * math.sin(self.arm1.rotation*math.pi/180)
-        self.arm2.y = self.arm1.y + (self.arm1.height-self.arm1.width) * math.cos(self.arm1.rotation*math.pi/180)
-        self.arm2.rotation = state[3] 
+        self.arm2.x        = self.arm1.x + (self.arm1.height-self.arm1.width) * math.sin(self.arm1.rotation*math.pi/180)
+        self.arm2.y        = self.arm1.y + (self.arm1.height-self.arm1.width) * math.cos(self.arm1.rotation*math.pi/180)
+        self.arm2.rotation = state[3]
 
 
     def _scores_detection(self,state):
@@ -348,7 +348,7 @@ def discrete(s):
     return [x_r,y_r,int(angle_arm1),int(angle_arm2),tuple(weight_set)]
 
 
-def record(pd_frame,batch,episode,s,done,mean_reward):
+def record(pd_frame,batch,episode,s,done,mean_reward,cycle):
     """ By Record function,  all states will be saved in pd_frame.
     And pd_frame is waiting for exporting.
     Note: pd_frame = pd_frame.append is important. Otherwise pd_frame would be None.
@@ -372,18 +372,19 @@ def record(pd_frame,batch,episode,s,done,mean_reward):
                         's3':s[4][2],
                         'end_state':s,
                         'done':str(done),
-                        'mean_reward':mean_reward}], ignore_index=True)
+                        'mean_reward':mean_reward,
+                        'cycle':cycle}], ignore_index=True)
 
     return pd_frame
 
 if __name__ == '__main__':
-    file_name = 'misc/' + time.strftime("%m%d%H%M", time.localtime()) + '_' + str(MAX_EPISODES*MAX_BATCH) + '.csv'
+    file_name = 'code/misc/' + time.strftime("%m%d%H%M", time.localtime()) + '_' + str(MAX_EPISODES*MAX_BATCH) + '.csv'
 
     # Read new Q-Table or Create new Q-Table 
     rl.load_csv(file_name)
 
     # Initial record table and fileName 
-    record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward'))
+    record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward','cycle'))
     data_name = str(time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime()))
     
     # Start Batch
@@ -436,10 +437,10 @@ if __name__ == '__main__':
             
             # Record states, action and reward
             else: print('Episode unfinished. Current state progress:',s)
-            if DO_RECORD: record_table = record(record_table,k,str(i),s,done,np.mean(total_reward))
-        rl.save_csv(file_name)
-        
-        if DO_RECORD: 
-            record_table.to_csv( "misc/"+data_name+ ".csv",mode="a",index=False,sep=',')
-            record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward'))
+            if DO_RECORD: record_table = record(record_table,k,str(i),s,done,np.mean(total_reward),cycle)
+    
+    rl.save_csv(file_name)    
+    if DO_RECORD: 
+        record_table.to_csv( "code/misc/"+data_name+ ".csv",mode="a",index=False,sep=',')
+        record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward'))
 

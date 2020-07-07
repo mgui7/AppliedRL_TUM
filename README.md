@@ -13,7 +13,7 @@ In this Project, Reinforcement Learning is implemented to solve the task that ro
 
 ## How to use
 1. Open main.py
-2. Run.
+2. Run
 
 ## Introduction of files and folders
 ### Folders

@@ -38,8 +38,8 @@ class Q_LEARNING(object):
 
         Returns:
             [type]: [description]
-        """
-        # Observation: location, ang1, ang2
+        """ 
+        # Observation: location, ang1, ang2 
         observation[4] = tuple(observation[4])
         observation = tuple(observation)
         self.check_state_if_exist(observation)
