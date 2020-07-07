@@ -118,11 +118,11 @@ class Viewer(pyglet.window.Window):
         self.arm1.y = self.robot.y
         self.arm1.rotation = state[2]
 
-
         # Update location of arm2
         self.arm2.x = self.arm1.x + (self.arm1.height-self.arm1.width) * math.sin(self.arm1.rotation*math.pi/180)
         self.arm2.y = self.arm1.y + (self.arm1.height-self.arm1.width) * math.cos(self.arm1.rotation*math.pi/180)
         self.arm2.rotation = state[3] 
+
 
     def _scores_detection(self,state):
         """ This function will control the visibility of scores.
@@ -167,6 +167,7 @@ class Viewer(pyglet.window.Window):
         self.dispatch_event('on_draw')
         self.flip()
 
+
     def on_draw(self):
         """Official function from pyglet. 
         """
@@ -183,6 +184,7 @@ class Viewer(pyglet.window.Window):
         self.position_label.draw()
         self.angle_label.draw()
         
+        
     def center_image(self,image):
         """Change the anchor of imported image.
 
@@ -191,6 +193,7 @@ class Viewer(pyglet.window.Window):
         """
         image.anchor_x = image.width/2
         image.anchor_y = image.height/2
+    
     
     def change_image_arm(self,image):
         image.anchor_x = image.width/2
@@ -207,6 +210,14 @@ class MeinEnv(object):
         pass
 
     def update_state(self,action):
+        """[summary]
+
+        Args:
+            action ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         # Unzip state 
         x,y,angle_arm1,angle_arm2,weight_set = self.state 
         # Unzip action
@@ -217,7 +228,6 @@ class MeinEnv(object):
         y = min(580,max(y + V*robot_move/SAM_STEP,20))
         x = PATH[round(y)][0]
 
-
         angle_arm1 = angle_arm1 + DELTA_ANGLE * arm1_rotate
         angle_arm2 = angle_arm2 + DELTA_ANGLE * arm2_rotate
 
@@ -227,6 +237,14 @@ class MeinEnv(object):
         return None,None
 
     def step(self, action):
+        """[summary]
+
+        Args:
+            action ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         
         # Update state 
         self.update_state(action)
@@ -249,6 +267,7 @@ class MeinEnv(object):
 
         return self.state, self.reward, done
 
+
     def _reset_degree(self,degree):
         """ Degree is in 0 ~ 360
         Args:
@@ -256,11 +275,15 @@ class MeinEnv(object):
         Return:
             degree: angle after rescale.
         """
+
         if degree >= 360: return degree - 360
         elif degree < 0: return degree + 360
         return degree
 
+
     def render(self):
+        """[summary]
+        """
         # Initial a viewer
         if self.viewer is None:
             self.viewer = Viewer(self.state)
@@ -268,7 +291,13 @@ class MeinEnv(object):
         # If viewer is created, it should be updated.
         self.viewer.render(self.state,self.reward)
 
+
     def reset(self):
+        """[summary]
+
+        Returns:
+            [type]: [description]
+        """
         self.viewer = None
         # Reset the state 
         x = PATH[20][0]
@@ -282,7 +311,10 @@ class MeinEnv(object):
         self.reward = 0
         return self.state
     
+    
     def close(self):
+        """[summary]
+        """
         if self.viewer:
             self.viewer.close()
             self.viewer = None
