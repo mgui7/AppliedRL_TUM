@@ -256,12 +256,9 @@ class MeinEnv(object):
                         joint_position[1] + ARM_LEN * np.cos(math.pi*ang2/180))
 
         # Update reward
-        # self.reward, self.state[4] = R.reward2(finger_position,self.state[4])
-        # self.reward, self.state[4] = R.reward3(finger_position,self.state[4])
-        self.reward, self.state[4] = R.reward2(finger_position,self.state[4])
+        self.reward, self.state[4] = R.reward_Inorder(finger_position,self.state[4])
 
         # Update done
-        # done = bool(self.state[1] >= 580)
         #done = bool(self.state[1] >= 580) and sum(self.state[4]) == 0
         done = sum(self.state[4]) == 0 and R.isClose(finger_position[0], finger_position[1], 300, 580)
 
@@ -405,7 +402,7 @@ if __name__ == '__main__':
             # 
             for cycle in range(200):
 
-                # choose an action from Q-table
+                # Choose an action from Q-table
                 action = rl.choose_action(discrete(s))
                 # if plot window
                 if DO_PLOT: env.render()
