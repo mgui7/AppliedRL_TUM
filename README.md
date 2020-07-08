@@ -10,7 +10,7 @@ The project code of course "Applied Reinforcement Learning" in Technical Univers
 ## Goal of Project
 In this Project, Reinforcement Learning is implemented to solve the task that robot base and robotic arms can get all scores in movement.
 
-<img src="D:\OneDrive\文档\TUM\2020SS\Applied Reinforce learning\gitlab_arl\group-05\documentation\GUI.png" style="zoom:70%;" />
+<img src="\documentation\GUI.png" style="zoom:80%;" />
 
 ## How to use
 1. Open main.py
