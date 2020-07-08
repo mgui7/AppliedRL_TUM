@@ -9,8 +9,9 @@ end_point = [300,580]
 # it would automatically collect the cargo.
 threshold = 500
 
+
 def reward_Inorder(finger_pos,state):
-    """[The dense reward, where we set the cargo collecting order]
+    """The dense reward, where we set the cargo collecting order
     Args:
         finger_pos (tuple): Finger Position
         state (tuple): Cargo collection state
@@ -60,8 +61,9 @@ def reward_Inorder(finger_pos,state):
 
     return res, tuple(state)
 
+
 def reward_Noorder(finger_pos,state):
-    """[The dense reward, where we do not set the cargo collecting order]
+    """The dense reward, where we do not set the cargo collecting order
     Args:
         finger_pos (tuple): Finger Position
         state (tuple): Cargo collection state
@@ -89,8 +91,9 @@ def reward_Noorder(finger_pos,state):
         res += math.exp(-(math.sqrt(math.pow((x - x_score), 2) + math.pow((y - y_score), 2)))*0.0001) - 1.5
     return res - sum(state), tuple(state)
 
+
 def reward_sparse(finger_pos, state):
-    """[The dense reward, where we do not set the cargo collecting order]
+    """The dense reward, where we do not set the cargo collecting order
     Args:
         finger_pos (tuple): Finger Position
         state (tuple): Cargo collection state
@@ -117,6 +120,7 @@ def reward_sparse(finger_pos, state):
 
     return res, tuple(state)
 
+
 def reward_test(finger_pos, state):
     """[Testing reward]
     Args:
@@ -128,8 +132,9 @@ def reward_test(finger_pos, state):
     """
     return finger_pos[1] - 1000, tuple(state)
 
+
 def isClose(x,y,x1,y1):
-    """[Determining whether the finger is close enough to a cargo to collect it]
+    """Determining whether the finger is close enough to a cargo to collect it
     Args:
         x (float)   : finger pos x
         y (float)   : finger pos y

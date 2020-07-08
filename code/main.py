@@ -45,9 +45,6 @@ class Viewer(pyglet.window.Window):
         # Create a window and size of window is predefined.
         super(Viewer, self).__init__(width=600, height=600, resizable=False, caption='Arm', vsync=False)
 
-        # Color of Bg but is displaced by image here.
-        # pyglet.gl.glClearColor(1, 1, 1, 1)
-
         # save the elements into batch, prepare to draw
         self.batch = pyglet.graphics.Batch()
 
@@ -100,7 +97,6 @@ class Viewer(pyglet.window.Window):
             font_size=10,
             x=10, y=600-50,
             anchor_x='left', anchor_y='center',batch=self.batch,color=(0,0,0,255))
-
 
 
     def _update_robot(self,state):
@@ -204,27 +200,27 @@ class MeinEnv(object):
     """ MeinEnv class
     This Class creates an environment.
     """
-
     viewer = None
     def __init__(self):
         pass
 
+
     def update_state(self,action):
-        """[summary]
+        """update the state
 
         Args:
-            action ([type]): [description]
+            action (list): The action of robot.
 
         Returns:
-            [type]: [description]
+            [list]: updated state
         """
         # Unzip state 
-        x,y,angle_arm1,angle_arm2,weight_set = self.state 
+        x,y,angle_arm1,angle_arm2,weight_set = self.state
+
         # Unzip action
         robot_move, arm1_rotate, arm2_rotate = action
-        
-        # Update x and y w.r.t. action 
 
+        # Update x and y w.r.t. action
         y = min(580,max(y + V*robot_move/SAM_STEP,20))
         x = PATH[round(y)][0]
 
@@ -236,17 +232,18 @@ class MeinEnv(object):
 
         return None,None
 
+
     def step(self, action):
-        """[summary]
+        """The control function according to the action which can obtain the state of next step
 
         Args:
-            action ([type]): [description]
+            action (list): The action at present
 
         Returns:
-            [type]: [description]
+            [list]: The new state, reward and done
         """
         
-        # Update state 
+        # Update state
         self.update_state(action)
 
         x,y        = self.state[:2]
@@ -259,7 +256,6 @@ class MeinEnv(object):
         self.reward, self.state[4] = R.reward_Inorder(finger_position,self.state[4])
 
         # Update done
-        #done = bool(self.state[1] >= 580) and sum(self.state[4]) == 0
         done = sum(self.state[4]) == 0 and R.isClose(finger_position[0], finger_position[1], 300, 580)
 
         return self.state, self.reward, done
@@ -279,7 +275,7 @@ class MeinEnv(object):
 
 
     def render(self):
-        """[summary]
+        """render function in order to display
         """
         # Initial a viewer
         if self.viewer is None:
@@ -290,10 +286,10 @@ class MeinEnv(object):
 
 
     def reset(self):
-        """[summary]
+        """function to reset the parameters
 
         Returns:
-            [type]: [description]
+            [list]: initialized state
         """
         self.viewer = None
         # Reset the state 
@@ -310,13 +306,12 @@ class MeinEnv(object):
     
     
     def close(self):
-        """[summary]
+        """close function
         """
         if self.viewer:
             self.viewer.close()
             self.viewer = None
         
-
 
 def discrete(s):
     """ The states from Env are not satisfied the condition.
@@ -331,11 +326,6 @@ def discrete(s):
     x,y,angle_arm1,angle_arm2,weight_set = s
     x_r  = int(x)
     y_r  = int(round(y))
-    
-    # if angle_arm1 == 360: angle_arm1 = 0 
-    # else: angle_arm1 = round(angle_arm1/45)
-    # if angle_arm2 == 360: angle_arm2 = 0 
-    # else: angle_arm2 = round(angle_arm2/45)
 
     if angle_arm1 == 360: angle_arm1 = 0 
     else: angle_arm1 = round(angle_arm1)
@@ -374,11 +364,12 @@ def record(pd_frame,batch,episode,s,done,mean_reward,cycle):
 
     return pd_frame
 
+
 if __name__ == '__main__':
     file_name = 'code/misc/' + time.strftime("%m%d%H%M", time.localtime()) + '_' + str(MAX_EPISODES*MAX_BATCH) + '.csv'
 
     # Read new Q-Table or Create new Q-Table 
-    rl.load_csv(file_name)
+    rl.load_csv('code/misc/07081950_2500.csv')
 
     # Initial record table and fileName 
     record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward','cycle'))
@@ -386,24 +377,24 @@ if __name__ == '__main__':
     
     # Start Batch
     for k in range(MAX_BATCH):
-
         # Initial Env
         env = MeinEnv()
 
         for i in range(MAX_EPISODES):
             # Update episode label for each term
-
             # reset all state 
             s = env.reset()
             print("---------- "+str(i)+" term "+"----------")
+
             # Record total Reward
             total_reward = []
             
-            # 
+            # Start a cycle of task
             for cycle in range(200):
 
                 # Choose an action from Q-table
                 action = rl.choose_action(discrete(s))
+
                 # if plot window
                 if DO_PLOT: env.render()
                 
@@ -418,7 +409,7 @@ if __name__ == '__main__':
 
                 # Learning and update table
                 rl.learn(discrete(s), action, max(reward,max_reward), discrete(s_prime))
-                # print("s_prime: ", discrete(s_prime),"|s: ",discrete(s),"|R: ",reward,"|Action: ",action)
+
                 total_reward.append(max(reward,max_reward))
 
                 # Update states
@@ -426,9 +417,7 @@ if __name__ == '__main__':
                 
                 if done:
                     print("s_prime: ", discrete(s_prime),"|s: ",discrete(s),"|R: ",reward,"\n")
-                    # print("Done in",cycle,'Iterations')
-                    # pd_frame is exported as file if done is true.
-                   
+
                     env.close()
                     break
             

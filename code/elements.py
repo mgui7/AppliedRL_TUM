@@ -1,7 +1,6 @@
 """
-这个module存储着固定的，不会变化的背景图案，例如起点和终点。
+This model storage the background images which are fixed or not changed, for example the start and end point.
 """
-
 
 import pyglet
 from gym.envs.classic_control import rendering

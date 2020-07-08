@@ -7,11 +7,13 @@ screen_width    = elements.SCREEN_W
 screen_height   = elements.SCREEN_H
 ANGLE_STEPS     = elements.ANGLE_STEPS
 
+
 class Q_LEARNING(object):
-    """[Main Structure of Q-Learning]"""
+    """Main Structure of Q-Learning"""
+
 
     def __init__(self, lr = 0.1, reward_decay = 0.9, e_greedy = 0.9):
-        """[Initializing the Q-Learning Algorithm]
+        """Initializing the Q-Learning Algorithm
         Args:
             lr (float, optional):           [Learning rate]. Defaults to 0.1.
             reward_decay (float, optional): [Reward decay]. Defaults to 0.9.
@@ -26,8 +28,9 @@ class Q_LEARNING(object):
         self.epsilon = e_greedy
         self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
 
+
     def  choose_action(self, observation = (0,0,0,0,[0,0,0])):
-        """[Choosing the action based on the Q-table]
+        """Choosing the action based on the Q-table
         Args:
             observation (tuple, optional): [The current observed state]. Defaults to (0,0,0,0,[0,0,0]).
         Returns:
@@ -52,8 +55,9 @@ class Q_LEARNING(object):
             action = self.actions[idx]
         return action
 
+
     def learn(self, s, a, r, s_):
-        """[Learning from the state to state transition]
+        """Learning from the state to state transition
         Args:
             s (tuple)   : [The former state]
             a (tuple)   : [The chosen action]
@@ -72,10 +76,13 @@ class Q_LEARNING(object):
         else:
             # Next state is terminal
             q_target = [r]
-        self.q_table.loc[[s], [a]] += self.lr * (q_target[0] - q_predict.iloc[0,0])  # Update
+
+        # Update
+        self.q_table.loc[[s], [a]] += self.lr * (q_target[0] - q_predict.iloc[0,0])
+
 
     def check_state_if_exist(self,state):
-        """[Creating new state if that state is not available in the Q-table]
+        """Creating new state if that state is not available in the Q-table
         Args:
             state (tuple): [The state to be created]
         """
@@ -84,8 +91,9 @@ class Q_LEARNING(object):
             self.q_table = self.q_table.append(
                 pd.Series([0]*len(self.actions),index = self.q_table.columns, name  = state,))
 
+
     def save_csv(self,name = 'code/misc/q_table.csv'):
-        """[Saving the learning progress]
+        """Saving the learning progress
         Args:
             name (str, optional): [The relative path to save into]. Defaults to 'code/misc/q_table.csv'.
         """
@@ -102,12 +110,13 @@ class Q_LEARNING(object):
                 print('ML Process successfully overwritten into ' + name)
                 self.q_table.to_csv(name)
 
+
     def load_csv(self, name = 'code/misc/q_table.csv'):
-        """[Loading the learning progress]
+        """Loading the learning progress
         Args:
-            name (str, optional): [The relative path to load from]. Defaults to 'code/misc/q_table.csv'.
+            name (str, optional): The relative path to load from. Defaults to 'code/misc/q_table.csv'.
         Returns:
-            (bool): [Whether the loading process has been successfully carried out or not]
+            (bool): Whether the loading process has been successfully carried out or not
         """
         if os.path.isfile(name):
             self.q_table = pd.read_csv(name , index_col=[0])
