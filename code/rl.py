@@ -3,125 +3,91 @@ import elements
 import pandas as pd
 import os
 
-screen_width = elements.SCREEN_W
-screen_height = elements.SCREEN_H
-ANGLE_STEPS   = elements.ANGLE_STEPS
+screen_width    = elements.SCREEN_W
+screen_height   = elements.SCREEN_H
+ANGLE_STEPS     = elements.ANGLE_STEPS
 
 class Q_LEARNING(object):
-    """[summary]
+    """[Main Structure of Q-Learning]"""
 
-    Args:
-        object ([type]): [description]
-    """
-
-    def __init__(self, learning_rate = 0.1, reward_decay = 0.9, e_greedy = 0.9):
-        """[summary]
-
+    def __init__(self, lr = 0.1, reward_decay = 0.9, e_greedy = 0.9):
+        """[Initializing the Q-Learning Algorithm]
         Args:
-            learning_rate (float, optional): [description]. Defaults to 0.1.
-            reward_decay (float, optional): [description]. Defaults to 0.9.
-            e_greedy (float, optional): [description]. Defaults to 0.9.
+            lr (float, optional):           [Learning rate]. Defaults to 0.1.
+            reward_decay (float, optional): [Reward decay]. Defaults to 0.9.
+            e_greedy (float, optional):     [Coeff. for epsilon-greedy algorithm]. Defaults to 0.9.
         """
+        # The current action space. Consists of 27 available actions
         self.actions = [(i,j,k) for i in [-1,0,1] for j in [-1,0,1] for k in [-1,0,1]]
-        # self.actions = [(i,j,k) for i in [-1,0,1] for j in [0] for k in [0]]
         # self.actions = [(i,j,k) for i in [1] for j in [-1,0,1] for k in [-1,0,1]]
-        self.lr      = learning_rate
+
+        self.lr      = lr
         self.gamma   = reward_decay
         self.epsilon = e_greedy
         self.q_table = pd.DataFrame(columns=self.actions, dtype=np.float64)
 
     def  choose_action(self, observation = (0,0,0,0,[0,0,0])):
-        """[summary]
-
+        """[Choosing the action based on the Q-table]
         Args:
-            observation (tuple, optional): [description]. Defaults to (0,0,0,0,[0,0,0]).
-
+            observation (tuple, optional): [The current observed state]. Defaults to (0,0,0,0,[0,0,0]).
         Returns:
-            [type]: [description]
+            action: [The chosen action using epsilon-greedy algorithm]
         """ 
-        # Observation: location, ang1, ang2 
+        # Observation: location_x, location_y, angle1, angle2, the cargo states
         observation[4] = tuple(observation[4])
         observation = tuple(observation)
         self.check_state_if_exist(observation)
-        # action select
+
+        # Action select
         if np.random.uniform() < self.epsilon:
-            # choose the best action
+            # Choosing the best action
             state_action = self.q_table.loc[[observation], :]
-            # some actions may have the same value, randomly choose from these actions
+            # Some actions may have the same value, randomly choose from these actions in this case
             tmp    = state_action.iloc[:,state_action.values[0] == max(state_action.values[0])].columns
             idx    = np.random.choice(len(tmp))
             action = tmp[idx]
         else:
-            # choose the random action
+            # Choosing a random action
             idx    = np.random.choice(len(self.actions))
             action = self.actions[idx]
         return action
 
     def learn(self, s, a, r, s_):
-        """[summary]
-
+        """[Learning from the state to state transition]
         Args:
-            s ([type]): [description]
-            a ([type]): [description]
-            r ([type]): [description]
-            s_ ([type]): [description]
+            s (tuple)   : [The former state]
+            a (tuple)   : [The chosen action]
+            r (float)   : [The consequent reward for this transition process]
+            s_ (tuple)  : [The current state]
         """
         s, s_ = tuple(s), tuple(s_)
         self.check_state_if_exist(s_)
+        # Locating the predictive value
         q_predict = self.q_table.loc[[s], [a]]
+
+        # Checking if the state is terminal
         if not (s_[1] >= 580 and sum(s_[4]) == 0):
-            q_target = r + self.gamma * self.q_table.loc[[s_], :].max(axis = 1)  # next state is not terminal
+            # Next state is not terminal
+            q_target = r + self.gamma * self.q_table.loc[[s_], :].max(axis = 1)
         else:
-            q_target = [r]  # next state is terminal
-        self.q_table.loc[[s], [a]] += self.lr * (q_target[0] - q_predict.iloc[0,0])  # update
+            # Next state is terminal
+            q_target = [r]
+        self.q_table.loc[[s], [a]] += self.lr * (q_target[0] - q_predict.iloc[0,0])  # Update
 
     def check_state_if_exist(self,state):
-        """[summary]
-
+        """[Creating new state if that state is not available in the Q-table]
         Args:
-            state ([type]): [description]
+            state (tuple): [The state to be created]
         """
         if state not in self.q_table.index:
-            # append new state to q table
+            # Appending new state to q table
             self.q_table = self.q_table.append(
-                pd.Series(
-                    [0]*len(self.actions),
-                    index = self.q_table.columns,
-                    name  = state,
-                )
-            )
-
-    def save_file(self, name = 'q_table.npy'):
-        """[summary]
-
-        Args:
-            name (str, optional): [description]. Defaults to 'q_table.npy'.
-        """
-        np.save(name , self.q_table)
-        print('ML Process successfully saved into' + name)
-
-    def load_file(self, name = 'q_table.npy'):
-        """[summary]
-
-        Args:
-            name (str, optional): [description]. Defaults to 'q_table.npy'.
-
-        Returns:
-            [type]: [description]
-        """
-        try:
-            self.q_table = np.load(name)
-            print('ML Process successfully loaded from' + name)
-            return True
-        except Exception as e:
-            print('Error occured while loading NP array')
-            return False
+                pd.Series([0]*len(self.actions),index = self.q_table.columns, name  = state,))
 
     def save_csv(self,name = 'code/misc/q_table.csv'):
-        """[summary]
-
+        """[Saving the learning progress]
         Args:
-            name (str, optional): [description]. Defaults to 'code/misc/q_table.csv'.
+            name (str, optional): [The relative path to save into]. Defaults to 'code/misc/q_table.csv'.
         """
         if not os.path.isfile(name):
             print('ML Process successfully saved into ' + name)
@@ -137,18 +103,18 @@ class Q_LEARNING(object):
                 self.q_table.to_csv(name)
 
     def load_csv(self, name = 'code/misc/q_table.csv'):
-        """[summary]
-
+        """[Loading the learning progress]
         Args:
-            name (str, optional): [description]. Defaults to 'code/misc/q_table.csv'.
-
+            name (str, optional): [The relative path to load from]. Defaults to 'code/misc/q_table.csv'.
         Returns:
-            [type]: [description]
+            (bool): [Whether the loading process has been successfully carried out or not]
         """
         if os.path.isfile(name):
             self.q_table = pd.read_csv(name , index_col=[0])
             print('ML Process successfully loaded from ' + name)
+
             def helper(string):
+                # Helper to tuplize the column and row integers
                 string = [_ for _ in string]
                 for i in range(len(string)):
                     tmp = string[i]
@@ -158,20 +124,21 @@ class Q_LEARNING(object):
                     string[i] = [round(float(_)) for _ in tmp]
                 return string
 
-
             tmp = helper(self.q_table.columns)
+            # Tuplize the elements in column names
             tmp = [tuple(_) for _ in tmp]
             self.q_table.columns = tmp
 
             tmp = helper(self.q_table.index)
+            # Tuplize the elements in row names
             for i in range(len(tmp)):
                 t = tmp[i]
+                # Rearrange into the correct format
                 tmp[i] = (t[0],t[1],t[2],t[3],(t[4],t[5],t[6]))
             self.q_table.index = tmp
 
             return True
         else:
-            print('Error occured while loading CSV, creating new dataset')
-            print('---Press ENTER to continue---')
-            # input()
+            print('Error occurred while loading CSV. \nCreating new data set')
+            print('-' * 50)
             return False
