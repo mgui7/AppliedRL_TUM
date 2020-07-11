@@ -25,6 +25,7 @@ In this Project, Reinforcement Learning is implemented to solve the task that ro
 - code/misc: miscellaneous folder
 
 ### Files
+- code/quick_start.py: "Hello World" file and run it directly. 
 - code/main.py: Clean py file to quick testing. It will import classes and functions from env.py, therefore this file is very clean and you can test your algorithm directly.
 - code/reward_calculate.py: We provided different reward modes to test the performance of RL algorithm. 
 - code/rl.py: Reinforcement learning algorithm.
