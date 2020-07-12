@@ -13,6 +13,8 @@ from Box2D.b2 import (edgeShape, circleShape, fixtureDef, polygonShape,
 import gym
 from gym import spaces
 
+import rl
+
 # define constants
 FPS = 50
 SCALE = 30.0
@@ -665,3 +667,27 @@ class MarsLander(gym.Env):
         if self.viewer is not None:
             self.viewer.close()
             self.viewer = None
+
+q_learning = rl.Q_LEARNING()
+
+if __name__ == "__main__":
+
+    env = MarsLander()
+
+    for _ in range(100):
+        obs = env.reset()
+        obs = obs[0]
+
+        while True:
+            env.render()
+            action = q_learning.choose_action(obs)
+
+            new_state, reward, done, solved_problem = env.step(action)
+
+            q_learning.learn(obs,action,reward,new_state)
+
+            obs = new_state
+
+            print(obs, reward, done, solved_problem)
+            # input()
+            if done: break

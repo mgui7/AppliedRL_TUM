@@ -5,6 +5,7 @@ import gym
 import os
 from gym import spaces
 from gym.envs.classic_control import rendering
+import rl
 
 screen_width = 400
 screen_height = 600
@@ -68,7 +69,7 @@ class PipePair:
     # self.lower_pipeImg = pygame.image.load(os.path.join(img_path, 'pipe.png'))
     # self.lower_pipeImg = pygame.transform.scale(self.lower_pipeImg, (150, 335))
     # self.upper_pipeImg = pygame.transform.flip(self.lower_pipeImg, False, True)
-    self.y_lower = 0.6 * screen_height + random_height_variation
+    self.y_lower = 0.6 * screen_height + 0
     self.y_upper = self.y_lower - self.pair_gap - 355
 
   def check_collision(self, x, y):
@@ -304,10 +305,34 @@ class FlappyEnv(gym.Env):
   def close(self):
     self.flappy.close()
 
+q_learning = rl.Q_LEARNING()
 
 if __name__ == "__main__":
-  g = Game()
-  while True:
-    g.update()
-    g.view()
-    g.observe()
+  # g = Game()
+  # while True:
+  #   g.update()
+  #   g.view()
+  #   result = g.observe()
+  #   print(result)
+    env = FlappyEnv()
+    for _ in range(1000):
+        obs = env.reset()
+
+        while True:
+            env.render()
+
+            action = q_learning.choose_action(obs)
+            # print(action)
+            # action = 0
+            new_obs, reward, done, _ = env.step(action)
+
+            q_learning.learn(obs,action,reward,new_obs)
+
+            obs = new_obs
+
+            if done:
+                break
+
+        print(obs , reward)
+
+

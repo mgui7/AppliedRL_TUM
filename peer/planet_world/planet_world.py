@@ -8,6 +8,7 @@ from Box2D.b2 import (edgeShape, circleShape, fixtureDef, polygonShape, revolute
 import gym
 from gym import spaces
 from gym.envs.classic_control import rendering
+import rl
 
 # Render graphics
 SCALE = 30.0  # Scaling factor
@@ -291,5 +292,30 @@ class PlanetWorld(gym.Env):
 
     return state, reward, self.success, done
 
+q_learning = rl.Q_LEARNING()
+
 if __name__ == '__main__':
-  PlanetWorld()
+    env = PlanetWorld()
+
+    for _ in range(10):
+
+      state = env.reset()
+
+      while True:
+
+        # env.render()
+
+        action = q_learning.choose_action(state)
+
+        new_state, reward, success, done = env.step(action)
+
+        q_learning.learn(state, action,reward,new_state)
+
+        state = new_state
+
+        # print(state,reward, success,done)
+
+        if done: break
+
+
+
