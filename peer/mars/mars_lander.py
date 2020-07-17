@@ -3,7 +3,7 @@ import numpy as np
 import logging
 import os
 from collections import deque
-
+import pandas as pd
 # Box2D imports
 import Box2D
 from Box2D.b2 import (edgeShape, circleShape, fixtureDef, polygonShape,
@@ -671,19 +671,24 @@ class MarsLander(gym.Env):
 q_learning = rl.Q_LEARNING()
 
 if __name__ == "__main__":
-
+    
+    
+    record_table = pd.DataFrame(columns=('episode','mean_reward','total_reward'))
     env = MarsLander()
 
-    for _ in range(100):
+    for episode in range(2000):
+        
         obs = env.reset()
         obs = obs[0]
-
+        
+        total_reward = []
+        
         while True:
-            env.render()
+            # env.render()
             action = q_learning.choose_action(obs)
 
             new_state, reward, done, solved_problem = env.step(action)
-
+            total_reward.append(reward)
             q_learning.learn(obs,action,reward,new_state)
 
             obs = new_state
@@ -691,3 +696,9 @@ if __name__ == "__main__":
             print(obs, reward, done, solved_problem)
             # input()
             if done: break
+    
+        record_table = record_table.append([{'episode':episode,
+                    'mean_reward':np.mean(total_reward),
+                    'total_reward':np.sum(total_reward)}], ignore_index=True)
+    
+    record_table.to_csv( "mars_lander_result.csv",mode="a",index=False,sep=',')

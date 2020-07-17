@@ -6,7 +6,7 @@ import os
 from gym import spaces
 from gym.envs.classic_control import rendering
 import rl
-
+import pandas as pd
 screen_width = 400
 screen_height = 600
 # gameDisplay = pygame.display.set_mode((screen_width, screen_height))
@@ -314,25 +314,32 @@ if __name__ == "__main__":
   #   g.view()
   #   result = g.observe()
   #   print(result)
-    env = FlappyEnv()
-    for _ in range(1000):
-        obs = env.reset()
+  
+    record_table = pd.DataFrame(columns=('episode','mean_reward','total_reward'))
 
+
+    env = FlappyEnv()
+    for episode in range(10):
+        obs = env.reset()
+        total_reward = []
+        
         while True:
-            env.render()
+            #env.render()
 
             action = q_learning.choose_action(obs)
             # print(action)
             # action = 0
             new_obs, reward, done, _ = env.step(action)
-
+            total_reward.append(reward)
             q_learning.learn(obs,action,reward,new_obs)
 
             obs = new_obs
 
             if done:
                 break
-
-        print(obs , reward)
+              
+        record_table = record_table.append([{'episode':episode,'mean_reward':np.mean(total_reward),'total_reward':np.sum(total_reward)}], ignore_index=True)
+    
+    record_table.to_csv( "flappy_bird_result.csv",mode="a",index=False,sep=',')
 
 

@@ -21,8 +21,8 @@ SAM_STEP = 45    # sample steps
 MAX_EPISODES = 5 # Number of episodes
 MAX_BATCH = 2    # Number of Batch
 
-DO_PLOT = 1    # Display or not
-DO_RECORD = 0  # Record or not
+DO_PLOT = 0    # Display or not
+DO_RECORD = 1  # Record or not
 
 DELTA_ANGLE = 1 # Angular velocity
 V = 20          # Velocity of Robot Base
@@ -335,7 +335,7 @@ def discrete(s):
     return [x_r,y_r,int(angle_arm1),int(angle_arm2),tuple(weight_set)]
 
 
-def record(pd_frame,batch,episode,s,done,mean_reward,cycle):
+def record(pd_frame,batch,episode,s,done,mean_reward,sum_reward,cycle):
     """ By Record function,  all states will be saved in pd_frame.
     And pd_frame is waiting for exporting.
     Note: pd_frame = pd_frame.append is important. Otherwise pd_frame would be None.
@@ -360,6 +360,7 @@ def record(pd_frame,batch,episode,s,done,mean_reward,cycle):
                         'end_state':s,
                         'done':str(done),
                         'mean_reward':mean_reward,
+                        'sum_reward':sum_reward,
                         'cycle':cycle}], ignore_index=True)
 
     return pd_frame
@@ -372,7 +373,7 @@ if __name__ == '__main__':
     rl.load_csv('code/misc/07081950_2500.csv')
 
     # Initial record table and fileName 
-    record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward','cycle'))
+    record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward','sum_reward','cycle'))
     data_name = str(time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime()))
     
     # Start Batch
@@ -423,10 +424,10 @@ if __name__ == '__main__':
             
             # Record states, action and reward
             else: print('Episode unfinished. Current state progress:',s)
-            if DO_RECORD: record_table = record(record_table,k,str(i),s,done,np.mean(total_reward),cycle)
+            if DO_RECORD: record_table = record(record_table,k,str(i),s,done,np.mean(total_reward),round(np.sum(total_reward)),cycle)
     
     rl.save_csv(file_name)    
     if DO_RECORD: 
         record_table.to_csv( "code/misc/"+data_name+ ".csv",mode="a",index=False,sep=',')
-        record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward'))
+        record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward','sum_reward','cycle'))
 

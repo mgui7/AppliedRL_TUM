@@ -4,7 +4,7 @@ import numpy as np
 import Box2D
 from Box2D import b2Vec2
 from Box2D.b2 import (edgeShape, circleShape, fixtureDef, polygonShape, revoluteJointDef, contactListener)
-
+import pandas as pd
 import gym
 from gym import spaces
 from gym.envs.classic_control import rendering
@@ -295,10 +295,14 @@ class PlanetWorld(gym.Env):
 q_learning = rl.Q_LEARNING()
 
 if __name__ == '__main__':
+  
+    record_table = pd.DataFrame(columns=('episode','mean_reward','total_reward'))
+
     env = PlanetWorld()
 
-    for _ in range(10):
-
+    for episode in range(10):
+      
+      total_reward = []
       state = env.reset()
 
       while True:
@@ -308,6 +312,7 @@ if __name__ == '__main__':
         action = q_learning.choose_action(state)
 
         new_state, reward, success, done = env.step(action)
+        total_reward.append(reward)
 
         q_learning.learn(state, action,reward,new_state)
 
@@ -316,6 +321,11 @@ if __name__ == '__main__':
         # print(state,reward, success,done)
 
         if done: break
+        
+      record_table = record_table.append([{'episode':episode,'mean_reward':np.mean(total_reward),'total_reward':np.sum(total_reward)}], ignore_index=True)
+      
+    record_table.to_csv( "planet_world_result.csv",mode="a",index=False,sep=',')
+
 
 
 
