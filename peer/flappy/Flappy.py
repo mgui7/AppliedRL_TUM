@@ -315,7 +315,7 @@ if __name__ == "__main__":
   #   result = g.observe()
   #   print(result)
   
-    record_table = pd.DataFrame(columns=('episode','mean_reward','total_reward'))
+    record_table = pd.DataFrame(columns=('episode','mean_reward','total_reward','final_reward'))
 
 
     env = FlappyEnv()
@@ -338,7 +338,7 @@ if __name__ == "__main__":
             if done:
                 break
               
-        record_table = record_table.append([{'episode':episode,'mean_reward':np.mean(total_reward),'total_reward':np.sum(total_reward)}], ignore_index=True)
+        record_table = record_table.append([{'episode':episode,'mean_reward':np.mean(total_reward),'total_reward':np.sum(total_reward),"final_reward":reward}], ignore_index=True)
     
     record_table.to_csv( "flappy_bird_result.csv",mode="a",index=False,sep=',')
 

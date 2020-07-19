@@ -296,12 +296,12 @@ q_learning = rl.Q_LEARNING()
 
 if __name__ == '__main__':
   
-    record_table = pd.DataFrame(columns=('episode','mean_reward','total_reward'))
+    record_table = pd.DataFrame(columns=('episode','mean_reward','total_reward','final_reward'))
 
     env = PlanetWorld()
-
-    for episode in range(10):
-      
+# 17:53 - 21: 00 = 100 123
+    for episode in range(300):
+      print(episode)
       total_reward = []
       state = env.reset()
 
@@ -322,7 +322,7 @@ if __name__ == '__main__':
 
         if done: break
         
-      record_table = record_table.append([{'episode':episode,'mean_reward':np.mean(total_reward),'total_reward':np.sum(total_reward)}], ignore_index=True)
+      record_table = record_table.append([{'episode':episode,'mean_reward':np.mean(total_reward),'total_reward':np.sum(total_reward),"final_reward":reward}], ignore_index=True)
       
     record_table.to_csv( "planet_world_result.csv",mode="a",index=False,sep=',')
 

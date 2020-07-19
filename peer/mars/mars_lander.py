@@ -673,10 +673,10 @@ q_learning = rl.Q_LEARNING()
 if __name__ == "__main__":
     
     
-    record_table = pd.DataFrame(columns=('episode','mean_reward','total_reward'))
+    record_table = pd.DataFrame(columns=('episode','mean_reward','total_reward','final_reward'))
     env = MarsLander()
-
-    for episode in range(2000):
+# 10:04
+    for episode in range(1000):
         
         obs = env.reset()
         obs = obs[0]
@@ -699,6 +699,7 @@ if __name__ == "__main__":
     
         record_table = record_table.append([{'episode':episode,
                     'mean_reward':np.mean(total_reward),
-                    'total_reward':np.sum(total_reward)}], ignore_index=True)
+                    'total_reward':np.sum(total_reward),
+                    "final_reward":reward}], ignore_index=True)
     
     record_table.to_csv( "mars_lander_result.csv",mode="a",index=False,sep=',')

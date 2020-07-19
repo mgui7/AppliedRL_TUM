@@ -21,8 +21,8 @@ SAM_STEP = 45    # sample steps
 MAX_EPISODES = 5 # Number of episodes
 MAX_BATCH = 2    # Number of Batch
 
-DO_PLOT = 0    # Display or not
-DO_RECORD = 1  # Record or not
+DO_PLOT = 1    # Display or not
+DO_RECORD = 0  # Record or not
 
 DELTA_ANGLE = 1 # Angular velocity
 V = 20          # Velocity of Robot Base
