@@ -4,3 +4,5 @@ __pycache__/rl.cpython-36.pyc
 code/misc
 
 code/playground1.py
+/peer/mars/mars_lander_result.csv
+/peer/mars/*.csv

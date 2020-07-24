@@ -669,11 +669,12 @@ class MarsLander(gym.Env):
             self.viewer = None
 
 q_learning = rl.Q_LEARNING()
+# q_learning.load_csv('q_table.csv')
 
 if __name__ == "__main__":
     
     
-    record_table = pd.DataFrame(columns=('episode','mean_reward','total_reward','final_reward'))
+    record_table = pd.DataFrame(columns=('episode','mean_reward','total_reward','final_reward','solved'))
     env = MarsLander()
 # 10:04
     for episode in range(1000):
@@ -693,13 +694,16 @@ if __name__ == "__main__":
 
             obs = new_state
 
-            print(obs, reward, done, solved_problem)
+            # print(obs, reward, done, solved_problem)
             # input()
             if done: break
     
         record_table = record_table.append([{'episode':episode,
                     'mean_reward':np.mean(total_reward),
                     'total_reward':np.sum(total_reward),
-                    "final_reward":reward}], ignore_index=True)
+                    "final_reward":reward,
+                    'solved':solved_problem}], ignore_index=True)
+        print(obs, reward, done, solved_problem)
     
-    record_table.to_csv( "mars_lander_result.csv",mode="a",index=False,sep=',')
+    record_table.to_csv("mars_lander_result2.csv",mode="a",index=False,sep=',')
+    q_learning.save_csv('q_table2.csv')

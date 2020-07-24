@@ -7,7 +7,7 @@ class Q_LEARNING(object):
     """Main Structure of Q-Learning"""
 
 
-    def __init__(self, lr = 0.1, reward_decay = 0.9, e_greedy = 0.9):
+    def __init__(self, lr = 0.01, reward_decay = 0.9, e_greedy = 0.9):
         """Initializing the Q-Learning Algorithm
         Args:
             lr (float, optional):           [Learning rate]. Defaults to 0.1.
@@ -77,6 +77,9 @@ class Q_LEARNING(object):
         # Locating the predictive value
         q_predict = self.q_table.loc[[s], [a]]
 
+        if r == 50: r += 10000
+        # r -= 100
+
         # Checking if the state is terminal
         if not (s_[1] >= 580 and sum(s_[4]) == 0):
             # Next state is not terminal
@@ -138,21 +141,21 @@ class Q_LEARNING(object):
                     tmp = tmp.replace(')','')
                     tmp = tmp.replace('(','')
                     tmp = tmp.split(',')
-                    string[i] = [round(float(_)) for _ in tmp]
+                    string[i] = [float(_) for _ in tmp]
                 return string
 
-            tmp = helper(self.q_table.columns)
+            # tmp = helper(self.q_table.columns)
             # Tuplize the elements in column names
-            tmp = [tuple(_) for _ in tmp]
+            tmp = [int(_) for _ in self.q_table.columns]
             self.q_table.columns = tmp
 
-            tmp = helper(self.q_table.index)
-            # Tuplize the elements in row names
-            for i in range(len(tmp)):
-                t = tmp[i]
-                # Rearrange into the correct format
-                tmp[i] = (t[0],t[1],t[2],t[3],(t[4],t[5],t[6]))
-            self.q_table.index = tmp
+            tmp = self.q_table.index
+            # # Tuplize the elements in row names
+            # for i in range(len(tmp)):
+            #     t = tmp[i]
+            #     # Rearrange into the correct format
+            #     tmp[i] = (t[0],t[1],t[2],t[3],(t[4],t[5],t[6]))
+            self.q_table.index = [tuple(_) for _ in tmp]
 
             return True
         else:
