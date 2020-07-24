@@ -66,6 +66,30 @@ def show_cycle(NUM_OF_SAMPLES = 500,intv = 10):
     plt.show()
 
 
-# show_cargoes()
+def show_reward(NUM_OF_SAMPLES = 500,intv = 10):
+    repo = []
+    for i in range(3):
+        plt.subplot(2,2,i+1)
+        path = PATHS[i]
+        path = 'misc/' + path + '.csv'
+        table = pd.read_csv(path)
 
-show_cycle()
+        total_cycle = np.array(table.iloc[:,[7]])
+        total_cycle = [_[0] for _ in total_cycle[:NUM_OF_SAMPLES]]
+        sns.lineplot(range(1,NUM_OF_SAMPLES + 1),total_cycle)
+
+        plt.title(ind_to_name[i])
+        repo.append([sum(total_cycle[i:i+intv]) / intv for i in range(0,NUM_OF_SAMPLES,intv)])
+        plt.plot(range(int(intv/2),NUM_OF_SAMPLES,intv),[sum(total_cycle[i:i+intv]) / intv for i in range(0,NUM_OF_SAMPLES,intv)])
+
+    plt.subplot(224)
+    for i in range(3):
+        sns.lineplot(range(int(intv/2),NUM_OF_SAMPLES,intv),repo[i])
+    plt.legend([ind_to_name[i] for i in range(3)])
+    plt.suptitle('Mean Reward')
+    plt.show()
+
+
+# show_cargoes(500)
+
+show_reward()
