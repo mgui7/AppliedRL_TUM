@@ -14,15 +14,15 @@ from rl import Q_LEARNING
 rl = Q_LEARNING()
 
 # Load path of robot
-PATH = np.load('code/maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
+PATH = np.load('maps/long_map_300_sin.npy',encoding = "latin1")[0:581]
 
 # Global variables
 SAM_STEP = 45    # sample steps
-MAX_EPISODES = 5 # Number of episodes
-MAX_BATCH = 2    # Number of Batch
+MAX_EPISODES = 500 # Number of episodes
+MAX_BATCH = 4    # Number of Batch
 
-DO_PLOT = 1    # Display or not
-DO_RECORD = 0  # Record or not
+DO_PLOT = 0    # Display or not
+DO_RECORD = 1  # Record or not
 
 DELTA_ANGLE = 1 # Angular velocity
 V = 20          # Velocity of Robot Base
@@ -367,10 +367,10 @@ def record(pd_frame,batch,episode,s,done,mean_reward,sum_reward,cycle):
 
 
 if __name__ == '__main__':
-    file_name = 'code/misc/' + time.strftime("%m%d%H%M", time.localtime()) + '_' + str(MAX_EPISODES*MAX_BATCH) + '.csv'
+    file_name = 'misc/' + time.strftime("%m%d%H%M", time.localtime()) + '_' + str(MAX_EPISODES*MAX_BATCH) + '.csv'
 
     # Read new Q-Table or Create new Q-Table 
-    rl.load_csv('code/misc/07081950_2500.csv')
+    #rl.load_csv('misc/07081950_2500.csv')
 
     # Initial record table and fileName 
     record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward','sum_reward','cycle'))
@@ -428,6 +428,6 @@ if __name__ == '__main__':
     
     rl.save_csv(file_name)    
     if DO_RECORD: 
-        record_table.to_csv( "code/misc/"+data_name+ ".csv",mode="a",index=False,sep=',')
+        record_table.to_csv( "misc/"+data_name+"_Noorder"".csv",mode="a",index=False,sep=',')
         record_table = pd.DataFrame(columns=('batch','term','s1','s2','s3',"end_state",'done','mean_reward','sum_reward','cycle'))
 
